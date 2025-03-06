@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { COLORS, FONTS, SIZES, icons } from '../constants';
 import Header from '../components/Header';
-import BASE_URL from '../Api/commonApi';
+import BASE_URL from '../api/CommonApi';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ViewMembers = ({ navigation }) => {

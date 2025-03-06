@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import Header from '../components/Header';
-import BASE_URL from '../Api/commonApi';
+import BASE_URL from '../api/CommonApi';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { COLORS, FONTS, SIZES, icons, images } from '../constants';

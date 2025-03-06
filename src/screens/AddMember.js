@@ -21,7 +21,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DatePicker from 'react-native-date-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import BASE_URL from '../Api/commonApi';
+import BASE_URL from "../api/CommonApi";
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;

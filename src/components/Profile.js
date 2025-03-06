@@ -19,7 +19,7 @@ const Profile = ({ navigation }) => {
         {/* Header Section */}
         <View style={styles.headerSection}>
           <Image
-            source={require('../assets/images/gym1.jpg')}
+            source={require('../../assets/images/gym1.jpg')}
             style={styles.profileImage}
           />
           <Text style={styles.userName}>John Doe</Text>

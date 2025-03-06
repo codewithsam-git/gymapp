@@ -2,14 +2,14 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import BookDetail from './screens/BookDetail';
-import Tabs from './navigation/tabs';
-import ViewMembers from './screens/ViewMembers';
-import AddMember from './screens/AddMember';
-import Login from './screens/Login';
-import AddPackage from './screens/AddPackage';
-import ViewPackages from './screens/ViewPackages';
-import Profile from "./components/Profile";
+import BookDetail from './src/screens/BookDetail';
+import Tabs from './src/navigation/tabs';
+import ViewMembers from './src/screens/ViewMembers';
+import AddMember from './src/screens/AddMember';
+import Login from './src/screens/Login';
+import AddPackage from './src/screens/AddPackage';
+import ViewPackages from './src/screens/ViewPackages';
+import Profile from "./src/components/Profile";
 
 import {
   StatusBar,
@@ -19,7 +19,7 @@ import {
   TouchableOpacity,
   
 } from 'react-native';
-import { COLORS } from './constants';
+import { COLORS } from './src/constants/';
 import {
   DrawerContentScrollView,
   DrawerItemList,
