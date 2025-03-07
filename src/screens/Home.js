@@ -39,23 +39,6 @@ const Home = ({ navigation }) => {
     navigation.navigate('viewMember');
   };
 
-  const [packages, setPackages] = React.useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://192.168.31.132:9000/get-package');
-        const data = await response.json();
-        console.log(data.data);
-        setPackages(data.data);
-      } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   const profileData = {
     name: 'Username',
     point: 200,
@@ -377,7 +360,7 @@ const Home = ({ navigation }) => {
     );
   }
 
-  function renderCategoryData() {
+  function renderCategoryData(member) {
     var books = [];
 
     // Filter books based on selected category
@@ -428,10 +411,10 @@ const Home = ({ navigation }) => {
               justifyContent: 'space-between',
             }}>
             <Text style={{ color: COLORS.lightGray, textAlign: 'center' }}>
-              Silver
+              {member.package_name}
             </Text>
             <Text style={{ color: COLORS.lightGray, textAlign: 'center' }}>
-              3 Month
+              {member.duration}
             </Text>
           </View>
         </View>
@@ -738,6 +721,7 @@ const Home = ({ navigation }) => {
   }
 
   const [members, setMembers] = useState([]);
+  const [packages, setPackages] = useState([]);
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -758,6 +742,27 @@ const Home = ({ navigation }) => {
 
     fetchMembers();
   }, [members]);
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        console.log(`${BASE_URL}/get-packages`);
+        const response = await fetch(`${BASE_URL}/get-packages`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("packages data: ", data);
+        setPackages(data);
+      } catch (err) {
+        console.error('Fetch error:', err);
+      }
+    };
+
+    fetchPackages();
+  }, [packages]);
 
   function renderMemberCard(member) {
     return (
@@ -810,7 +815,24 @@ const Home = ({ navigation }) => {
 
         <View>
           <View>{renderPackagesTitleSection()}</View>
-          <View>{renderCategoryData()}</View>
+          <View>
+            {packages.length === 0 && (
+              <Text style={{ color: COLORS.lightGray, textAlign: 'center' }}>
+                No packages found
+              </Text>
+            )}
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1 }}
+              scrollEnabled={true}>
+              {packages.map((member, index) => (
+                <TouchableOpacity
+                  key={member.id}
+                  onPress={() => navigation.navigate('updatePlan')}>
+                  <View>{renderCategoryData(member)}</View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
         </View>
 
         <View>
@@ -827,10 +849,8 @@ const Home = ({ navigation }) => {
               {members.map((member, index) => (
                 <TouchableOpacity
                   key={member.id}
-                  onPress={() => navigation.navigate('updatePlan') }>
-                  <View>
-                    {renderMemberCard(member)}
-                  </View>
+                  onPress={() => navigation.navigate('updatePlan')}>
+                  <View>{renderMemberCard(member)}</View>
                 </TouchableOpacity>
               ))}
             </ScrollView>
