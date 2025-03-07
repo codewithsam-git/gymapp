@@ -13,95 +13,95 @@ import {
 } from 'react-native';
 import { COLORS, FONTS, SIZES, icons } from '../constants';
 import Header from '../components/Header';
-import BASE_URL from '../api/CommonApi';
+import BASE_URL from '../Api/commonApi';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
-const ViewPackages = ({ navigation }) => {
-  const members = [
-    {
-      id: 1,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@email.com',
-      mobileNo: '123-456-7890',
-    },
-    {
-      id: 2,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane.smith@email.com',
-      mobileNo: '987-654-3210',
-    },
-    {
-      id: 3,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@email.com',
-      mobileNo: '123-456-7890',
-    },
-    {
-      id: 4,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane.smith@email.com',
-      mobileNo: '987-654-3210',
-    },
-    {
-      id: 5,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@email.com',
-      mobileNo: '123-456-7890',
-    },
-    {
-      id: 6,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane.smith@email.com',
-      mobileNo: '987-654-3210',
-    },
-    {
-      id: 7,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@email.com',
-      mobileNo: '123-456-7890',
-    },
-    {
-      id: 8,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane.smith@email.com',
-      mobileNo: '987-654-3210',
-    },
-    {
-      id: 8,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane.smith@email.com',
-      mobileNo: '987-654-3210',
-    },
-    {
-      id: 8,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane.smith@email.com',
-      mobileNo: '987-654-3210',
-    },
-    {
-      id: 8,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane.smith@email.com',
-      mobileNo: '987-654-3210',
-    },
-  ];
 
-  // const [members, setMembers] = useState([]);
+const ViewPackages = () => {
+  // const members = [
+  //   {
+  //     id: 1,
+  //     firstName: 'John',
+  //     lastName: 'Doe',
+  //     email: 'john.doe@email.com',
+  //     mobileNo: '123-456-7890',
+  //   },
+  //   {
+  //     id: 2,
+  //     firstName: 'Jane',
+  //     lastName: 'Smith',
+  //     email: 'jane.smith@email.com',
+  //     mobileNo: '987-654-3210',
+  //   },
+  //   {
+  //     id: 3,
+  //     firstName: 'John',
+  //     lastName: 'Doe',
+  //     email: 'john.doe@email.com',
+  //     mobileNo: '123-456-7890',
+  //   },
+  //   {
+  //     id: 4,
+  //     firstName: 'Jane',
+  //     lastName: 'Smith',
+  //     email: 'jane.smith@email.com',
+  //     mobileNo: '987-654-3210',
+  //   },
+  //   {
+  //     id: 5,
+  //     firstName: 'John',
+  //     lastName: 'Doe',
+  //     email: 'john.doe@email.com',
+  //     mobileNo: '123-456-7890',
+  //   },
+  //   {
+  //     id: 6,
+  //     firstName: 'Jane',
+  //     lastName: 'Smith',
+  //     email: 'jane.smith@email.com',
+  //     mobileNo: '987-654-3210',
+  //   },
+  //   {
+  //     id: 7,
+  //     firstName: 'John',
+  //     lastName: 'Doe',
+  //     email: 'john.doe@email.com',
+  //     mobileNo: '123-456-7890',
+  //   },
+  //   {
+  //     id: 8,
+  //     firstName: 'Jane',
+  //     lastName: 'Smith',
+  //     email: 'jane.smith@email.com',
+  //     mobileNo: '987-654-3210',
+  //   },
+  //   {
+  //     id: 8,
+  //     firstName: 'Jane',
+  //     lastName: 'Smith',
+  //     email: 'jane.smith@email.com',
+  //     mobileNo: '987-654-3210',
+  //   },
+  //   {
+  //     id: 8,
+  //     firstName: 'Jane',
+  //     lastName: 'Smith',
+  //     email: 'jane.smith@email.com',
+  //     mobileNo: '987-654-3210',
+  //   },
+  //   {
+  //     id: 8,
+  //     firstName: 'Jane',
+  //     lastName: 'Smith',
+  //     email: 'jane.smith@email.com',
+  //     mobileNo: '987-654-3210',
+  //   },
+  // ];
 
-  const handleAddMemberClick = () => {
-    navigation.navigate('addMember');
-  };
+  const navigation = useNavigation();
+
+  const [members, setMembers] = useState([]);
 
   const [menuVisible, setMenuVisible] = useState(false); // To toggle menu visibility
 
@@ -110,39 +110,54 @@ const ViewPackages = ({ navigation }) => {
   };
 
   useEffect(() => {
-    console.log(`${BASE_URL}` + `/get-member`);
-    fetch(`${BASE_URL}/get-member`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data.data);
+    const fetchMembers = async () => {
+      try {
+        console.log(`${BASE_URL}/get-package`);
+        const response = await fetch(`${BASE_URL}/get-package`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data);
         setMembers(data.data);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+      } catch (err) {
+        console.error('Fetch error:', err);
+      }
+    };
+
+    fetchMembers();
+  }, [members]);
 
   function renderMemberCard(member) {
     return (
       <View style={styles.memberCard}>
-        <View style={styles.avatarContainer}>
-          <Image
-            source={icons.profile_icon}
-            style={styles.avatar}
-            resizeMode="contain"
-          />
-        </View>
+        <TouchableWithoutFeedback>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={{
+                uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgzPKFziefwggi6URHF_ApNhe9okKizqq4lRBjzG9QQ5--_Ch0Iq9IUtPONEw9-SeKlqs&usqp=CAU',
+              }}
+              style={styles.avatar}
+              resizeMode="cover"
+            />
+          </View>
+        </TouchableWithoutFeedback>
 
-        <View style={styles.memberDetails}>
-          <Text style={styles.memberName}>
-            {member.firstName} {member.lastName}
-          </Text>
-          <Text style={styles.memberPlan}>Plan : {member.packageType}</Text>
-        </View>
+        <TouchableWithoutFeedback>
+          <View style={styles.memberDetails}>
+            <Text style={styles.memberName}>
+              {member.packageName}
+            </Text>
+            <Text style={styles.memberPlan}>Plan : {member.duration}</Text>
+          </View>
+        </TouchableWithoutFeedback>
 
         <TouchableOpacity style={styles.menuButton} onPress={handleMenuToggle}>
           <Icon name="more-vert" size={24} color="white" />
         </TouchableOpacity>
 
-        {/* Modal or dropdown for Edit and Delete options */}
         {menuVisible && (
           <View style={styles.menu}>
             <TouchableOpacity
@@ -163,22 +178,6 @@ const ViewPackages = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         )}
-
-        {/*<View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() =>
-              navigation.navigate('EditMember', { memberId: member.id })
-            }>
-            <Text style={styles.buttonText}>Edit</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={() => handleDelete(member.id)}>
-            <Text style={styles.buttonText}>Delete</Text>
-          </TouchableOpacity>
-        </View>*/}
       </View>
     );
   }
@@ -215,18 +214,33 @@ const ViewPackages = ({ navigation }) => {
               <Text style={styles.header}>Packages</Text>
             </View>
 
-            <View></View>
+            <View>
+              <Text style={styles.header}> </Text>
+            </View>
           </View>
         </View>
 
-        <ScrollView>
-          {members.map((member, index) => (
-            <View key={member.id}>
-              {renderMemberCard(member)}
-              {index < members.length - 1 && <View style={styles.separator} />}
-            </View>
-          ))}
-        </ScrollView>
+        <View style={{ marginTop: SIZES.font }}>
+          {members.length === 0 && (
+            <Text style={{ color: COLORS.lightGray, textAlign: 'center' }}>
+              No packages found
+            </Text>
+          )}
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            scrollEnabled={true}>
+            {members.map((member, index) => (
+              <TouchableOpacity
+                key={member.id}
+                onPress={() => {
+                  navigation.navigate('profile');
+                }}>
+                <View>{renderMemberCard(member)}</View>
+                {members.length - 1 && <View style={styles.separator} />}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
@@ -273,7 +287,6 @@ const styles = StyleSheet.create({
   memberCard: {
     flexDirection: 'row',
     padding: SIZES.base,
-    marginTop: SIZES.font,
     marginHorizontal: SIZES.base,
     borderRadius: SIZES.radius,
     shadowColor: COLORS.black,

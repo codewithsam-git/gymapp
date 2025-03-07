@@ -13,10 +13,12 @@ import {
 } from 'react-native';
 import { COLORS, FONTS, SIZES, icons } from '../constants';
 import Header from '../components/Header';
-import BASE_URL from '../api/CommonApi';
+import BASE_URL from '../Api/commonApi';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
-const ViewMembers = ({ navigation }) => {
+
+const ViewMembers = () => {
   // const members = [
   //   {
   //     id: 1,
@@ -97,11 +99,9 @@ const ViewMembers = ({ navigation }) => {
   //   },
   // ];
 
-  const [members, setMembers] = useState([]);
+  const navigation = useNavigation();
 
-  const handleAddMemberClick = () => {
-    navigation.navigate('addMember');
-  };
+  const [members, setMembers] = useState([]);
 
   const [menuVisible, setMenuVisible] = useState(false); // To toggle menu visibility
 
@@ -131,7 +131,7 @@ const ViewMembers = ({ navigation }) => {
 
   function renderMemberCard(member) {
     return (
-      <View style={styles.memberCard} onPress={navigation.navigate('profile')}>
+      <View style={styles.memberCard}>
         <TouchableWithoutFeedback>
           <View style={styles.avatarContainer}>
             <Image
@@ -229,12 +229,14 @@ const ViewMembers = ({ navigation }) => {
             contentContainerStyle={{ flexGrow: 1 }}
             scrollEnabled={true}>
             {members.map((member, index) => (
-              <View key={member.id}>
-                {renderMemberCard(member)}
-                {index < members.length - 1 && (
-                  <View style={styles.separator} />
-                )}
-              </View>
+              <TouchableOpacity
+                key={member.id}
+                onPress={() => {
+                  navigation.navigate('profile');
+                }}>
+                <View>{renderMemberCard(member)}</View>
+                {members.length - 1 && <View style={styles.separator} />}
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>

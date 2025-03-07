@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,29 @@ import {
   SafeAreaView,
   ScrollView,
   TextInput,
+  Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SIZES, images } from '../constants';
+import MemberBill from './MemberBill';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
-const Profile = ({ navigation }) => {
+const Profile = () => {
+  const navigation = useNavigation();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView>
         {/* Header Section */}
+
         <View style={styles.headerSection}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backIconContainer}>
+            <Icon name="arrow-back" size={30} color={COLORS.white} />
+          </TouchableOpacity>
           <Image
-            source={require('../../assets/images/gym1.jpg')}
+            source={require('../assets/images/gym1.jpg')}
             style={styles.profileImage}
           />
           <Text style={styles.userName}>John Doe</Text>
@@ -44,7 +55,6 @@ const Profile = ({ navigation }) => {
               <Icon name="pencil" size={20} color={COLORS.white} />
             </View>
           </View>
-
           {/* Social Icons Section */}
           <View style={styles.iconContainer}>
             <TouchableOpacity style={styles.iconWrapper}>
@@ -60,7 +70,6 @@ const Profile = ({ navigation }) => {
               <Text style={styles.iconLabel}>Renew</Text>
             </TouchableOpacity>
           </View>
-
           <View style={styles.cardContainer}>
             {/* Title Section */}
             <Text style={styles.title}>Personal Info</Text>
@@ -152,7 +161,6 @@ const Profile = ({ navigation }) => {
               </View>
             </View>
           </View>
-
           <View style={styles.cardContainer}>
             <Text style={styles.title}>Status</Text>
             <View style={styles.separator}></View>
@@ -173,7 +181,6 @@ const Profile = ({ navigation }) => {
               </View>
             </View>
           </View>
-
           <View style={styles.cardContainer}>
             <Text style={styles.title}>Plan Dates</Text>
             <View style={styles.separator}></View>
@@ -209,7 +216,6 @@ const Profile = ({ navigation }) => {
               </View>
             </View>
           </View>
-
           <View style={styles.cardContainer}>
             <Text style={styles.title}>Payment Details</Text>
             <View style={styles.separator}></View>
@@ -259,12 +265,19 @@ const styles = StyleSheet.create({
   headerSection: {
     height: 250,
     width: '100%',
+    marginTop: Platform.OS === 'ios' ? 0 : 50,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
     position: 'relative',
     borderBottomLeftRadius: '15%',
     borderBottomRightRadius: '15%',
+  },
+  backIconContainer: {
+    position: 'absolute',
+    top: 10, // Position it at the top of the image
+    left: 10, // Position it to the left of the image
+    zIndex: 1, // Make sure the icon is above the image
   },
   profileHeader: {
     justifyContent: 'center',
@@ -315,13 +328,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: COLORS.white,
-    padding: SIZES.base
+    padding: SIZES.base,
   },
   cardContainer: {
     borderRadius: 10,
     padding: SIZES.base,
     marginTop: SIZES.font,
-    backgroundColor: '#202428'
+    backgroundColor: '#202428',
   },
   title: {
     fontSize: 18,
@@ -362,6 +375,20 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: COLORS.lightGray,
     marginVertical: SIZES.base,
+  },
+  generateBillButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary,
+    padding: SIZES.base * 1.5,
+    borderRadius: 10,
+    marginVertical: SIZES.base,
+  },
+  generateBillText: {
+    ...FONTS.body3,
+    color: COLORS.white,
+    marginLeft: SIZES.base,
   },
 });
 

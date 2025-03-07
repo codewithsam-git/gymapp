@@ -20,25 +20,58 @@ import Header from '../components/Header';
 import { Dropdown } from 'react-native-element-dropdown';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { launchImageLibrary } from 'react-native-image-picker'; // Import the image picker
+import BASE_URL from '../Api/commonApi';
 
 const AddPackage = ({ navigation }) => {
   const [isPlanNameFocus, setIsPlanNameFocus] = useState(false);
   const [isDurationFocus, setIsDurationFocus] = useState(false);
   const [staff, setStaff] = useState('');
-  const [imageUri, setImageUri] = useState(null); // State for storing the image URI
+  const [imageUrl, setImageUrl] = useState(null);
+  const [packageName, setPackageName] = useState('');
+  const [price, setPrice] = useState('');
+  const [duration, setDuration] = useState('');
 
-  const handleSubmit = () => {
-    Alert.alert(
-      'Success',
-      'Package added successfully!',
-      [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
-      { cancelable: false }
-    );
-    setPackageName('');
-    setPrice('');
-    setDuration('');
-    setStaff('');
-    setImageUri(null);
+  const packageData = {
+    packageName: packageName,
+    price: price,
+    duration: duration,
+    staff: staff,
+    imageUrl: imageUrl,
+  };
+
+  const handleSubmit = async () => {
+    try {
+      console.log(`${BASE_URL}/save-package`);
+      console.log('packageData: ', packageData);
+      const response = await fetch(`http://192.168.31.132:9000/save-package`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(packageData),
+      });
+
+      console.log('response: ', response);
+
+      if (response.status === 200) {
+        Alert.alert(
+          'Success',
+          'Package added successfully!',
+          [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+          { cancelable: false }
+        );
+        setPackageName('');
+        setPrice('');
+        setDuration('');
+        setStaff('');
+        setImageUrl(null);
+      } else {
+        throw new Error('Failed to add package');
+      }
+    } catch (error) {
+      console.error('Error submitting data:', error);
+      Alert.alert('Error', 'Failed to add package, please try again');
+    }
   };
 
   const onCancel = () => {
@@ -48,14 +81,10 @@ const AddPackage = ({ navigation }) => {
   const pickImage = () => {
     launchImageLibrary({ mediaType: 'photo', quality: 1 }, (response) => {
       if (response.assets && response.assets.length > 0) {
-        setImageUri(response.assets[0].uri); // Set the selected image URI
+        setImageUrl(response.assets[0].uri); // Set the selected image URI
       }
     });
   };
-
-  const [packageName, setPackageName] = useState('');
-  const [price, setPrice] = useState('');
-  const [duration, setDuration] = useState('');
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -80,10 +109,7 @@ const AddPackage = ({ navigation }) => {
                     style={styles.inputIcon}
                   />
                   <Dropdown
-                    style={[
-                      styles.input,
-                      isPlanNameFocus,
-                    ]}
+                    style={[styles.input, isPlanNameFocus]}
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
                     inputSearchStyle={styles.inputSearchStyle}
@@ -117,7 +143,7 @@ const AddPackage = ({ navigation }) => {
                     style={styles.inputIcon}
                   />
                   <TextInput
-                    placeholder="City"
+                    placeholder="Price"
                     placeholderTextColor={COLORS.lightGray}
                     value={price}
                     onChangeText={setPrice}
@@ -128,29 +154,27 @@ const AddPackage = ({ navigation }) => {
                 {/* Duration Dropdown */}
                 <View style={styles.inputContainer}>
                   <Icon
-                    name="clock"
+                    name="calendar"
                     size={20}
                     color={COLORS.primary}
                     style={styles.inputIcon}
                   />
                   <Dropdown
-                    style={[
-                      styles.input,
-                      isDurationFocus,
-                    ]}
+                    style={[styles.input, isDurationFocus]}
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
                     inputSearchStyle={styles.inputSearchStyle}
                     data={[
-                      { label: 'Silver', value: 'Silver' },
-                      { label: 'Gold', value: 'Gold' },
-                      { label: 'Diamond', value: 'Diamond' },
+                      { label: '1 month', value: '1 month' },
+                      { label: '3 months', value: '3 months' },
+                      { label: '6 months', value: '6 months' },
+                      { label: '1 year', value: '1 year' },
                     ]}
                     search
                     maxHeight={300}
                     labelField="label"
                     valueField="value"
-                    placeholder={!isDurationFocus ? 'Select Plan' : '...'}
+                    placeholder={!isDurationFocus ? 'Select Duration' : '...'}
                     searchPlaceholder="Search..."
                     value={duration}
                     onFocus={() => setIsDurationFocus(true)}
@@ -185,18 +209,16 @@ const AddPackage = ({ navigation }) => {
                     color={COLORS.primary}
                     style={styles.inputIcon}
                   />
-                  <TouchableOpacity
-                    onPress={pickImage}
-                    style={styles.input}>
+                  <TouchableOpacity onPress={pickImage} style={styles.input}>
                     <Text style={styles.imagePickerText}>
-                      {imageUri ? 'Change Image' : 'Select Image'}
+                      {imageUrl ? 'Change Image' : 'Select Image'}
                     </Text>
                   </TouchableOpacity>
                 </View>
-                {imageUri && (
+                {imageUrl && (
                   <View style={styles.imagePreviewContainer}>
                     <Image
-                      source={{ uri: imageUri }}
+                      source={{ uri: imageUrl }}
                       style={styles.imagePreview}
                     />
                   </View>
@@ -204,13 +226,13 @@ const AddPackage = ({ navigation }) => {
 
                 {/* Buttons */}
                 <View style={styles.buttonContainer}>
+                  <TouchableOpacity style={styles.button} onPress={onCancel}>
+                    <Text style={styles.buttonText}>Cancel</Text>
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.button}
                     onPress={handleSubmit}>
                     <Text style={styles.buttonText}>Submit</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.button} onPress={onCancel}>
-                    <Text style={styles.buttonText}>Cancel</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -235,7 +257,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'center', // Align items vertically centered
+    alignItems: 'center',
     marginBottom: 15,
   },
   formContainer: {

@@ -111,11 +111,11 @@ const Login = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.darkBlue,
+    backgroundColor: COLORS.black,
   },
   headerSection: {
     height: 250,
-    backgroundColor: COLORS.darkBlue,
+    backgroundColor: COLORS.black,
     justifyContent: 'center',
     alignItems: 'center',
     // borderBottomLeftRadius: SIZES.radius,

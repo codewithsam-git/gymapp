@@ -21,12 +21,14 @@ import { Dropdown } from 'react-native-element-dropdown';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DatePicker from 'react-native-date-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import BASE_URL from "../api/CommonApi";
-
+import BASE_URL from '../Api/commonApi';
+import MemberBill from '../components/MemberBill';
+import { useNavigation } from '@react-navigation/native';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-const AddMember = ({ navigation }) => {
+const AddMember = () => {
+  const navigation = useNavigation();
   const [currentStep, setCurrentStep] = useState(0);
   const [isCountryFocus, setIsCountryFocus] = useState(false);
   const [isGenderFocus, setIsGenderFocus] = useState(false);
@@ -165,6 +167,8 @@ const AddMember = ({ navigation }) => {
   const [duration, setDuration] = useState('');
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState('');
+  const [showBillingModal, setShowBillingModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setFirstName('');
@@ -199,26 +203,54 @@ const AddMember = ({ navigation }) => {
     }
   };
 
+  const memberData = {
+    name: firstName,
+    surname: lastName,
+    gender: gender,
+    birthdate: birthdate,
+    email: email,
+    phoneno: mobileNo,
+    country: country,
+    city: city,
+    planName: planName,
+    charges: charges,
+    discount: discount,
+    duration: duration,
+    start_Date: startDate,
+    end_date: endDate,
+    status: 1,
+    profile_image: 'img.jpg',
+  };
+
   const handleSubmit = async () => {
-    const memberData = {
-      name: firstName,
-      surname: lastName,
-      gender: gender,
-      birthdate: birthdate,
-      email: email,
-      phoneno: mobileNo,
-      country: country,
-      city: city,
-      planName: planName,
-      charges: charges,
-      discount: discount,
-      duration: duration,
-      start_Date: startDate,
-      end_date: endDate,
-      status: 1,
-      profile_image: 'img.jpg',
-    };
-    console.log('memberData', memberData);
+    if (!memberData.email) {
+      Alert.alert('Missing Data', ' Email is mandatory');
+      return;
+    }
+
+    if (
+      memberData.email &&
+      !/^[a-z0-9._%+-]+@[a-z]+\.[a-z]{2,4}(\.[a-z]{2,4})?$/.test(
+        memberData.email
+      )
+    ) {
+      Alert.alert('Invalid Data', 'Please enter a valid Email Id.');
+      return;
+    }
+
+    if (!memberData.phoneno) {
+      Alert.alert('Missing Data', 'Phone number is mandatory');
+      return;
+    }
+
+    if (memberData.phoneno && !/^[6-9]\d{9}$/.test(memberData.phoneno)) {
+      Alert.alert(
+        'Invalid Mobile Number',
+        'Please enter a valid phone number.'
+      );
+      return;
+    }
+    setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/save-members`, {
         method: 'POST',
@@ -230,10 +262,12 @@ const AddMember = ({ navigation }) => {
 
       console.log('response: ', response);
 
-      if (response.status == 200) {
+      if (response.status === 200) {
         Alert.alert('Success', 'Member added successfully!', [{ text: 'OK' }], {
           cancelable: false,
         });
+        console.log('memberData', memberData);
+
         setFirstName('');
         setLastName('');
         setGender('');
@@ -249,12 +283,17 @@ const AddMember = ({ navigation }) => {
         setStartDate('');
         setEndDate('');
         setCurrentStep(0);
+        setShowBillingModal(true);
+        setLoading(false);
+        navigation.navigate('memberBill');
       } else {
         throw new Error('Failed to add member');
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error submitting data:', error);
       Alert.alert('Error', 'Failed to add member, please try again');
+      setLoading(false);
     }
   };
 
@@ -267,7 +306,8 @@ const AddMember = ({ navigation }) => {
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}>
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={styles.formContainer}>
               {/* Step Indicator */}
@@ -575,8 +615,7 @@ const AddMember = ({ navigation }) => {
                           style={styles.inputIcon}
                         />
                         {startDate ? (
-                          <Text
-                            style={[styles.input, { color: COLORS.white }]}>
+                          <Text style={[styles.input, { color: COLORS.white }]}>
                             {startDate || 'Select Start Date'}{' '}
                           </Text>
                         ) : (
@@ -598,8 +637,7 @@ const AddMember = ({ navigation }) => {
                           style={styles.inputIcon}
                         />
                         {endDate ? (
-                          <Text
-                            style={[styles.input, { color: COLORS.white }]}>
+                          <Text style={[styles.input, { color: COLORS.white }]}>
                             {endDate || 'Select End Date'}{' '}
                           </Text>
                         ) : (
@@ -641,13 +679,21 @@ const AddMember = ({ navigation }) => {
                     Previous
                   </Text>
                 </TouchableOpacity>
+
                 {currentStep < steps.length - 1 ? (
-                  <TouchableOpacity onPress={nextStep}>
+                  <TouchableOpacity onPress={nextStep} disabled={loading}>
                     <Text style={styles.buttonText}>Next</Text>
                   </TouchableOpacity>
                 ) : (
-                  <TouchableOpacity onPress={handleSubmit}>
-                    <Text style={styles.buttonText}>Submit</Text>
+                  // Displaying the 'Save & Generate Bill' button or 'Generating...' message
+                  <TouchableOpacity onPress={handleSubmit} disabled={loading}>
+                    {loading ? (
+                      <Text style={[styles.buttonText, {opacity: loading ? 0.5 : 1}]}>Generating...</Text>
+                    ) : (
+                      <Text style={styles.buttonText}>
+                        Save & Generate Bill
+                      </Text>
+                    )}
                   </TouchableOpacity>
                 )}
               </View>
@@ -668,13 +714,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.secondary,
     borderRadius: SIZES.radius,
     marginTop: SIZES.padding2,
-    padding: SIZES.padding,
+    padding: SIZES.font,
     margin: SIZES.padding,
     height: 'auto',
   },
   stepContent: {
     marginTop: 20,
-    paddingHorizontal: SIZES.radius,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -699,7 +744,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     color: COLORS.primary,
   },

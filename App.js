@@ -2,74 +2,143 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import BookDetail from './src/screens/BookDetail';
-import Tabs from './src/navigation/tabs';
-import ViewMembers from './src/screens/ViewMembers';
-import AddMember from './src/screens/AddMember';
-import Login from './src/screens/Login';
-import AddPackage from './src/screens/AddPackage';
-import ViewPackages from './src/screens/ViewPackages';
-import Profile from "./src/components/Profile";
-
+import BookDetail from './screens/BookDetail';
+import Tabs from './navigation/tabs';
+import ViewMembers from './screens/ViewMembers';
+import AddMember from './screens/AddMember';
+import Login from './screens/Login';
+import AddPackage from './screens/AddPackage';
+import ViewPackages from './screens/ViewPackages';
+import Profile from './components/Profile';
+import MemberBill from './components/MemberBill';
+import UpdatePlan from './components/UpdatePlan';
 import {
   StatusBar,
   useColorScheme,
   Text,
   View,
   TouchableOpacity,
-  
+  StyleSheet,
+  Image,
+  SafeAreaView,
+  Platform
 } from 'react-native';
-import { COLORS } from './src/constants/';
+import { COLORS } from './constants';
 import {
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
-
-// Importing Ionicons for drawer icons
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const CustomDrawerContent = (props) => {
+  const { navigation } = props;
+
   return (
-    <View style={{ flex: 1, justifyContent: 'space-between' }}>
+    <SafeAreaView style={styles.drawerContainer}>
+      {/* Profile Header */}
+      <View style={styles.profileContainer}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('profile')}
+          style={styles.profileTouch}>
+          <Image
+            source={{ uri: 'https://randomuser.me/api/portraits/men/1.jpg' }}
+            style={styles.profileImage}
+          />
+          <Text style={styles.profileName}>John Doe</Text>
+          <Text style={styles.profileEmail}>john.doe@example.com</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Scrollable drawer items */}
-      <DrawerContentScrollView {...props}>
+      <DrawerContentScrollView
+        {...props}
+        contentContainerStyle={styles.scrollViewContent}>
         <DrawerItemList {...props} />
       </DrawerContentScrollView>
 
       {/* Logout button */}
       <TouchableOpacity
         onPress={() => {
-          props.navigation.reset({
-            index: 0,  
+          navigation.reset({
+            index: 0,
             routes: [{ name: 'login' }],
-        });
+          });
         }}
-        style={{
-          flexDirection: 'row', // Align icon and text horizontally
-          alignItems: 'center', // Center the items vertically
-          padding: 16,
-          backgroundColor: COLORS.primary,
-          margin: 22,
-          marginBottom: 30,
-          borderRadius: 8,
-        }}>
-        {/* Ionicons logout icon */}
+        style={styles.logoutButton}>
         <Ionicons
           name="log-out-outline"
           size={24}
           color="white"
-          style={{ marginRight: 8 }}
+          style={styles.logoutIcon}
         />
-
-        {/* Text for the button */}
-        <Text
-          style={{ color: 'white', textAlign: 'center', fontWeight: 'bold' }}>
-          Logout
-        </Text>
+        <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  drawerContainer: {
+    flex: 1,
+    backgroundColor: '#0A0D0F',
+  },
+  profileContainer: {
+    marginTop: Platform.OS === 'ios' ? 0 : 50,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.white,
+    backgroundColor: COLORS.lightGray + '20',
+    paddingBottom: 0,
+  },
+  profileTouch: {
+    alignItems: 'center',
+    paddingVertical: 15,
+  },
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 2,
+    borderColor: COLORS.white,
+    marginBottom: 12,
+  },
+  profileName: {
+    color: COLORS.white,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  profileEmail: {
+    color: COLORS.white,
+    fontSize: 14,
+    opacity: 0.8,
+  },
+  scrollViewContent: {
+    paddingTop: 15,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: '#b23b3b',
+    marginHorizontal: 20,
+    marginBottom: 20, // Standardized marginBottom for both platforms
+    borderRadius: 8,
+  },
+  logoutIcon: {
+    marginRight: 12,
+  },
+  logoutText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  appContainer: {
+    flex: 1,
+    backgroundColor: COLORS.black,
+  },
+  drawerIcon: {
+  },
+});
 
 const theme = {
   ...DefaultTheme,
@@ -89,16 +158,16 @@ const DrawerNavigator = () => {
       screenOptions={{
         headerShown: false,
         drawerStyle: {
-          backgroundColor: COLORS.secondary,
           width: 300,
         },
         drawerLabelStyle: {
-          fontSize: 18,
-          fontWeight: 'bold', 
+          fontSize: 16,
+          fontWeight: '600',
+          marginLeft: 0,
         },
-        drawerActiveTintColor: COLORS.white,
-        drawerActiveBackgroundColor: COLORS.primary,
+        drawerActiveTintColor: COLORS.primary,
         drawerInactiveTintColor: COLORS.white,
+        drawerActiveBackgroundColor: 'transparent',
       }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}>
       <Drawer.Screen
@@ -106,7 +175,12 @@ const DrawerNavigator = () => {
         component={Tabs}
         options={{
           drawerIcon: ({ color }) => (
-            <Ionicons name="home" size={24} color={color} />
+            <Ionicons
+              name="home"
+              size={24}
+              color={color}
+              style={styles.drawerIcon}
+            />
           ),
         }}
       />
@@ -115,7 +189,12 @@ const DrawerNavigator = () => {
         component={AddMember}
         options={{
           drawerIcon: ({ color }) => (
-            <Ionicons name="person-add" size={24} color={color} />
+            <Ionicons
+              name="person-add"
+              size={24}
+              color={color}
+              style={styles.drawerIcon}
+            />
           ),
         }}
       />
@@ -124,7 +203,12 @@ const DrawerNavigator = () => {
         component={ViewMembers}
         options={{
           drawerIcon: ({ color }) => (
-            <Ionicons name="people" size={24} color={color} />
+            <Ionicons
+              name="people"
+              size={24}
+              color={color}
+              style={styles.drawerIcon}
+            />
           ),
         }}
       />
@@ -133,7 +217,12 @@ const DrawerNavigator = () => {
         component={AddPackage}
         options={{
           drawerIcon: ({ color }) => (
-            <Ionicons name="archive" size={24} color={color} />
+            <Ionicons
+              name="archive"
+              size={24}
+              color={color}
+              style={styles.drawerIcon}
+            />
           ),
         }}
       />
@@ -142,7 +231,12 @@ const DrawerNavigator = () => {
         component={ViewPackages}
         options={{
           drawerIcon: ({ color }) => (
-            <Ionicons name="folder" size={24} color={color} />
+            <Ionicons
+              name="folder"
+              size={24}
+              color={color}
+              style={styles.drawerIcon}
+            />
           ),
         }}
       />
@@ -152,31 +246,35 @@ const DrawerNavigator = () => {
 
 const App = () => {
   const scheme = useColorScheme();
+
   return (
     <NavigationContainer theme={theme}>
-      <StatusBar
-        backgroundColor={COLORS.black}
-        barStyle={scheme == 'Light' ? 'dark-content' : 'light-content'}
-      />
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        initialRouteName={'Home'}>
-
-        <Stack.Screen name="Home" component={DrawerNavigator} />
-        <Stack.Screen name="addMember" component={AddMember} />
-        <Stack.Screen name="viewMember" component={ViewMembers} />
-        <Stack.Screen name="addPackage" component={AddPackage} />
-        <Stack.Screen name="viewPackage" component={ViewPackages} />
-        <Stack.Screen name="login" component={Login} />
-        <Stack.Screen name="profile" component={Profile} />
-        <Stack.Screen
-          name="BookDetail"
-          component={BookDetail}
-          options={{ headerShown: false }}
+      <SafeAreaView style={styles.appContainer}>
+        <StatusBar
+          backgroundColor={COLORS.black}
+          barStyle="light-content" // Fixed to light-content for consistency
         />
-      </Stack.Navigator>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+          initialRouteName={'Home'}>
+          <Stack.Screen name="Home" component={DrawerNavigator} />
+          <Stack.Screen name="addMember" component={AddMember} />
+          <Stack.Screen name="viewMember" component={ViewMembers} />
+          <Stack.Screen name="addPackage" component={AddPackage} />
+          <Stack.Screen name="viewPackage" component={ViewPackages} />
+          <Stack.Screen name="login" component={Login} />
+          <Stack.Screen name="profile" component={Profile} />
+          <Stack.Screen name="memberBill" component={MemberBill} />
+          <Stack.Screen name="updatePlan" component={UpdatePlan} />
+          <Stack.Screen
+            name="BookDetail"
+            component={BookDetail}
+            options={{ headerShown: false }}
+          />
+        </Stack.Navigator>
+      </SafeAreaView>
     </NavigationContainer>
   );
 };

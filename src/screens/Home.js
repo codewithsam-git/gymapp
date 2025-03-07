@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import Header from '../components/Header';
-import BASE_URL from '../api/CommonApi';
+import BASE_URL from '../Api/commonApi';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { COLORS, FONTS, SIZES, icons, images } from '../constants';
@@ -617,9 +617,6 @@ const Home = ({ navigation }) => {
           />
           <Text style={{ ...FONTS.h3, color: COLORS.white }}>Packages</Text>
         </View>
-        <View>
-          <Text style={{ ...FONTS.h3, color: COLORS.white }}>3</Text>
-        </View>
       </View>
     );
   }
@@ -649,9 +646,6 @@ const Home = ({ navigation }) => {
           <Text style={{ ...FONTS.h3, color: COLORS.white }}>
             Members with Expiring Plans
           </Text>
-        </View>
-        <View>
-          <Text style={{ ...FONTS.h3, color: COLORS.white }}>10</Text>
         </View>
       </View>
     );
@@ -749,16 +743,14 @@ const Home = ({ navigation }) => {
     const fetchMembers = async () => {
       try {
         console.log(`${BASE_URL}/members`);
-        const response = await fetch(
-          `https://jsonplaceholder.typicode.com/users`
-        );
+        const response = await fetch(`${BASE_URL}/members`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        setMembers(data);
+        setMembers(data.memberData);
       } catch (err) {
         console.error('Fetch error:', err);
       }
@@ -784,8 +776,7 @@ const Home = ({ navigation }) => {
 
           <View style={styles.memberDetails}>
             <Text style={styles.memberName}>
-              {member.name}
-              {member.surname}
+              {member.name} {member.surname}
             </Text>
             <Text style={styles.memberPlan}>{member.planName}</Text>
           </View>
@@ -834,12 +825,13 @@ const Home = ({ navigation }) => {
               contentContainerStyle={{ flexGrow: 1 }}
               scrollEnabled={true}>
               {members.map((member, index) => (
-                <View key={member.id}>
-                  {renderMemberCard(member)}
-                  {index < members.length - 1 && (
-                    <View style={styles.separator} />
-                  )}
-                </View>
+                <TouchableOpacity
+                  key={member.id}
+                  onPress={() => navigation.navigate('updatePlan') }>
+                  <View>
+                    {renderMemberCard(member)}
+                  </View>
+                </TouchableOpacity>
               ))}
             </ScrollView>
           </View>
