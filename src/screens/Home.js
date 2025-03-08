@@ -360,86 +360,25 @@ const Home = ({ navigation }) => {
     );
   }
 
-  function renderCategoryData(member) {
-    var books = [];
-
-    // Filter books based on selected category
-    let selectedCategoryBooks = categories.filter(
-      (a) => a.id == selectedCategory
-    );
-
-    if (selectedCategoryBooks.length > 0) {
-      books = selectedCategoryBooks[0].books;
-    }
-
-    // Ensure we have books to render
-    if (books.length === 0) {
-      return (
-        <View
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ color: COLORS.white }}>
-            No books available in this category
-          </Text>
-        </View>
-      );
-    }
-
-    const renderItem = ({ item }) => {
-      return (
-        <View style={{ marginRight: SIZES.padding, flexDirection: 'column' }}>
-          <View>
-            <TouchableOpacity
-              style={{ flexDirection: 'row', alignItems: 'center' }}
-              onPress={() =>
-                navigation.navigate('BookDetail', {
-                  book: item,
-                })
-              }>
-              {/* Book Cover */}
-              <Image
-                source={item.bookCover}
-                resizeMode="cover"
-                style={{ width: 140, height: 140, borderRadius: 10 }}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              marginVertical: SIZES.base,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text style={{ color: COLORS.lightGray, textAlign: 'center' }}>
-              {member.package_name}
-            </Text>
-            <Text style={{ color: COLORS.lightGray, textAlign: 'center' }}>
-              {member.duration}
-            </Text>
-          </View>
-        </View>
-      );
-    };
-
-    return (
-      <View
-        style={{
-          padding: SIZES.base,
-        }}>
-        <FlatList
-          data={books} // Use the filtered books array
-          keyExtractor={(item) => `${item.id}`}
-          renderItem={renderItem}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          nestedScrollEnabled={true}
-          contentContainerStyle={{
-            paddingVertical: SIZES.base,
-          }}
-        />
+  const renderCategoryData = ({ data }) => {
+    // Render each item in the list
+    const renderItem = ({ item }) => (
+      <View style={styles.item}>
+        <Text style={styles.itemText}>{item.package_name}</Text>
       </View>
     );
-  }
+
+    return (
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.listContainer}
+      />
+    );
+  };
 
   function renderMyBookSection() {
     return (
@@ -754,8 +693,8 @@ const Home = ({ navigation }) => {
         }
 
         const data = await response.json();
-        console.log("packages data: ", data);
-        setPackages(data);
+        console.log('packages data: ', data.memberData);
+        setPackages(data.memberData);
       } catch (err) {
         console.error('Fetch error:', err);
       }
@@ -815,23 +754,38 @@ const Home = ({ navigation }) => {
 
         <View>
           <View>{renderPackagesTitleSection()}</View>
-          <View>
-            {packages.length === 0 && (
+          <View
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            {packages.length === 0 ? (
               <Text style={{ color: COLORS.lightGray, textAlign: 'center' }}>
                 No packages found
               </Text>
+            ) : (
+              <FlatList
+                data={packages}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.packageItem} // Wrap TouchableOpacity for spacing
+                  >
+                    <View style={styles.packageContainer}>
+                      <Image
+                        source={images.gym1}
+                        style={styles.itemImage}
+                        resizeMode="cover"
+                      />
+                      <Text
+                        style={{ color: COLORS.white, textAlign: 'center' }}>
+                        {item.package_name || 'Package'}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false} // Optionally hide scroll indicator
+                contentContainerStyle={styles.flatListContent} // Add style for content container
+              />
             )}
-            <ScrollView
-              contentContainerStyle={{ flexGrow: 1 }}
-              scrollEnabled={true}>
-              {packages.map((member, index) => (
-                <TouchableOpacity
-                  key={member.id}
-                  onPress={() => navigation.navigate('updatePlan')}>
-                  <View>{renderCategoryData(member)}</View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
           </View>
         </View>
 
@@ -926,6 +880,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: COLORS.lightRed, // A color to stand out
+  },
+  packageItem: {
+    marginHorizontal: 10, // Add spacing between items
+    alignItems: 'center', // Center content within TouchableOpacity
+  },
+  packageContainer: {
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 150, // Adjust the height to your preference
+    width: 150, // Adjust the width to your preference
+  },
+  itemImage: {
+    width: '100%',
+    height: '70%', // Adjust height as needed
+    borderRadius: 10,    
+  },
+  flatListContent: {
+    paddingHorizontal: 15, // Add padding to the left and right for better alignment
   },
 });
 
